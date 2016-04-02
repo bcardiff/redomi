@@ -3,7 +3,7 @@
 **Experiment** in Remote Dom Manipulation.
 Build an app in crystal using the browser as a rendering engine.
 
-Check (sample/basic.cr)[sample/basic.cr]
+Check [sample/basic.cr](sample/basic.cr)
 
 ## Installation
 
