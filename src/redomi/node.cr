@@ -1,23 +1,24 @@
 module Redomi
   class Node
-    getter app
-    getter id
+    getter app : App
+    getter id : Int32
 
     # :nodoc:
-    # root node initializer
-    def initialize
-      @id = 0
+    def initialize(@id : Int32)
       @app = uninitialized App
     end
 
     # :nodoc:
-    def app=(@app : App)
+    def app=(@app)
+      @app.register_node(self)
     end
 
-    def initialize(parent : Node, tag : String)
-      @app = parent.app
-      @id = @app.create_node tag, parent
-      @app.register_node(self)
+    def append(node : Node)
+      @app.exec_node(self, "append", [node])
+    end
+
+    def parent
+      (@app.exec_node_wait_response(self, "parent") as Array)[0] as Node
     end
 
     def text=(text : String)
@@ -25,7 +26,7 @@ module Redomi
     end
 
     def text
-      @app.exec_node_wait_response(self, "text").as_s
+      @app.exec_node_wait_response(self, "text") as String
     end
 
     def add_class(class_names)

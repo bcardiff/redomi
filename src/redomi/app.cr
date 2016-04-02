@@ -30,9 +30,8 @@ module Redomi
         end
       end
 
-      @root = Node.new
+      @root = Node.new(0)
       @root.app = self
-      register_node @root
     end
 
     def init
@@ -43,26 +42,46 @@ module Redomi
       @ws.send %({"command": "log", "data": #{message.to_json}})
     end
 
-    def create_node(tag, parent)
+    def create_element(tag)
       @last_node_id += 1
+
       send_command "create" do |json|
         json.field "tag", tag
         json.field "id", @last_node_id
-        json.field "parent_id", parent ? parent.id : @root.id
       end
-      @last_node_id
+
+      node = Node.new(@last_node_id)
+      node.app = self
+      node
     end
 
+    # :nodoc:
     def register_node(node)
       @nodes[node.id] = node
+    end
+
+    def node_by_id(id)
+      @nodes[id]
     end
 
     def exec_node(node, method, args)
       send_command "exec_node" do |json|
         json.field "id", node.id
         json.field "method", method
-        json.field "args", args
+        json.field "args", encode_params(args)
       end
+    end
+
+    private def encode_param(arg)
+      if arg.is_a?(Node)
+        {"__remodi_node_id": arg.id}
+      else
+        arg
+      end
+    end
+
+    private def encode_params(args : Enumerable)
+      args.map { |arg| encode_param(arg) }.to_a
     end
 
     def exec_node_wait_response(node, method)
@@ -79,8 +98,9 @@ module Redomi
         json.field "args", [] of String
       end
 
-      response = ch.receive
+      response = ch.receive.raw.to_redomi(self)
       @pending_responses.delete(response_id)
+
       response
     end
 
