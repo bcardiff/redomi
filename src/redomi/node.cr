@@ -29,6 +29,10 @@ module Redomi
       @app.exec_node_wait_response(self, "text") as String
     end
 
+    def []=(attribute : String, value : String)
+      @app.exec_node(self, "attr", [attribute, value])
+    end
+
     def add_class(class_names)
       @app.exec_node(self, "addClass", [class_names])
     end

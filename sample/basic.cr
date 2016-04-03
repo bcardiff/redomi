@@ -6,6 +6,10 @@ port = 9090
 server = Redomi::Server.new host, port do |app|
   app.log "App started"
 
+  app.embed_stylesheet %(
+    .red { color: red; }
+  )
+
   app.create_element("h1").tap do |h1|
     h1.text = "Sample App"
     app.root.append h1
@@ -51,6 +55,8 @@ server = Redomi::Server.new host, port do |app|
 
   sleep 0.5
   second.parent.add_class "red"
+
+  pp app.find_node("h1").text
 end
 
 puts "Listening on http://#{host}:#{port}"

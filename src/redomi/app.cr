@@ -42,6 +42,14 @@ module Redomi
       @ws.send %({"command": "log", "data": #{message.to_json}})
     end
 
+    def embed_stylesheet(css_code)
+      node = create_element("style")
+      node["type"] = "text/css"
+      node.text = css_code
+      find_node("head").append(node)
+      node
+    end
+
     def create_element(tag)
       @last_node_id += 1
 
@@ -55,13 +63,29 @@ module Redomi
       node
     end
 
+    def find_node(query)
+      result = send_command_sync "find_node" do |json|
+        json.field "query", query
+      end
+      (result as Array)[0] as Node
+    end
+
     # :nodoc:
     def register_node(node)
       @nodes[node.id] = node
     end
 
     def node_by_id(id)
-      @nodes[id]
+      node = @nodes[id]?
+      # if the id is known, it was assigned by the client
+      # client assigned id are negatives
+      # server assigned id are positives (App#create_element)
+      # 0 is the root element that the client decided which to be. Usually <body>
+      unless node
+        @nodes[id] = node = Node.new(id)
+        node.app = self
+      end
+      node
     end
 
     def exec_node(node, method, args)
@@ -85,23 +109,11 @@ module Redomi
     end
 
     def exec_node_wait_response(node, method)
-      @last_response_id += 1
-      response_id = @last_response_id
-
-      ch = Channel(JSON::Any).new # :: Channel::Unbuffered
-      @pending_responses[response_id] = ch
-
-      send_command "exec_node_wait_response" do |json|
-        json.field "response_id", response_id
+      send_command_sync "exec_node_wait_response" do |json|
         json.field "id", node.id
         json.field "method", method
         json.field "args", [] of String
       end
-
-      response = ch.receive.raw.to_redomi(self)
-      @pending_responses.delete(response_id)
-
-      response
     end
 
     def on_node_event(node, event, proc : Node -> Void)
@@ -123,6 +135,24 @@ module Redomi
           end
         end
       end)
+    end
+
+    private def send_command_sync(command)
+      @last_response_id += 1
+      response_id = @last_response_id
+
+      ch = Channel(JSON::Any).new # :: Channel::Unbuffered
+      @pending_responses[response_id] = ch
+
+      send_command command do |json, io|
+        json.field "response_id", response_id
+        yield json, io
+      end
+
+      response = ch.receive.raw.to_redomi(self)
+      @pending_responses.delete(response_id)
+
+      response
     end
   end
 end
