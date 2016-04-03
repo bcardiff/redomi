@@ -13,32 +13,32 @@ module Redomi
       @app.register_node(self)
     end
 
-    def append(node : Node)
-      @app.exec_node(self, "append", [node])
+    def append_child(node : Node)
+      @app.eval("%s.appendChild(%s)", self, node)
     end
 
     def parent
-      (@app.exec_node_wait_response(self, "parent") as Array)[0] as Node
+      @app.eval_sync("%s.parentElement", self) as Node
     end
 
-    def text=(text : String)
-      @app.exec_node(self, "text", [text])
+    def text_content=(text : String)
+      @app.eval("%s.textContent = %s", self, text)
     end
 
-    def text
-      @app.exec_node_wait_response(self, "text") as String
+    def text_content
+      @app.eval_sync("%s.textContent", self) as String
     end
 
     def []=(attribute : String, value : String)
-      @app.exec_node(self, "attr", [attribute, value])
+      @app.eval("%s.setAttribute(%s, %s)", self, attribute, value)
     end
 
-    def add_class(class_names)
-      @app.exec_node(self, "addClass", [class_names])
+    def class_name=(cssClass : String)
+      @app.eval("%s.className = %s", self, cssClass)
     end
 
     def on_click(&on_click : Node -> Void)
-      @app.on_node_event(self, "click", on_click)
+      @app.add_event_listener(self, "click", on_click)
     end
   end
 end

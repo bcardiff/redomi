@@ -20,13 +20,13 @@ module Redomi
           end
         when "node_event"
           data = json["data"]
-          node = @nodes[data["id"].as_i]
+          node = @nodes[data["node_id"].as_i]
           spawn do
             @node_events[{node.id, data["event"].as_s}].call(node)
           end
         when "response"
           data = json["data"]
-          @pending_responses[data["id"].as_i].send(data["value"])
+          @pending_responses[data["response_id"].as_i].send(data["value"])
         end
       end
 
@@ -39,14 +39,14 @@ module Redomi
     end
 
     def log(message)
-      @ws.send %({"command": "log", "data": #{message.to_json}})
+      eval "console.log(%s)", message
     end
 
     def embed_stylesheet(css_code)
       node = create_element("style")
       node["type"] = "text/css"
-      node.text = css_code
-      find_node("head").append(node)
+      node.text_content = css_code
+      query_selector("head").append_child(node)
       node
     end
 
@@ -63,11 +63,8 @@ module Redomi
       node
     end
 
-    def find_node(query)
-      result = send_command_sync "find_node" do |json|
-        json.field "query", query
-      end
-      (result as Array)[0] as Node
+    def query_selector(query)
+      eval_sync("document.querySelector(%s)", query) as Node
     end
 
     # :nodoc:
@@ -88,14 +85,6 @@ module Redomi
       node
     end
 
-    def exec_node(node, method, args)
-      send_command "exec_node" do |json|
-        json.field "id", node.id
-        json.field "method", method
-        json.field "args", encode_params(args)
-      end
-    end
-
     private def encode_param(arg)
       if arg.is_a?(Node)
         {"__remodi_node_id": arg.id}
@@ -108,18 +97,35 @@ module Redomi
       args.map { |arg| encode_param(arg) }.to_a
     end
 
-    def exec_node_wait_response(node, method)
-      send_command_sync "exec_node_wait_response" do |json|
-        json.field "id", node.id
-        json.field "method", method
-        json.field "args", [] of String
+    def eval(command, *arg : Redomi::Type)
+      send_command "eval" do |json|
+        json.field "script", build_client_script(command, *arg)
       end
     end
 
-    def on_node_event(node, event, proc : Node -> Void)
+    def eval_sync(command, *arg : Redomi::Type)
+      send_command_sync "eval_sync" do |json|
+        json.field "script", build_client_script(command, *arg)
+      end
+    end
+
+    private def build_client_script(command, *args : Redomi::Type)
+      args_client = args.map do |arg|
+        case arg
+        when Node
+          "nodes[%i]" % arg.id
+        else
+          arg.to_json
+        end
+      end
+
+      command % args_client
+    end
+
+    def add_event_listener(node, event, proc : Node -> Void)
       @node_events[{node.id, event}] = proc
-      send_command "on_node_event" do |json|
-        json.field "id", node.id
+      send_command "add_event_listener" do |json|
+        json.field "node_id", node.id
         json.field "event", event
       end
     end
