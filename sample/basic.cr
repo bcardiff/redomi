@@ -1,13 +1,17 @@
 require "../src/redomi"
+require "../src/redomi/lib/jquery"
 
 host = "localhost"
 port = 9090
 
-server = Redomi::Server.new host, port do |app|
+server = Redomi::Server.new(host, port, File.join(__DIR__, "public")) do |app|
+  app.load_script "/jquery-2.2.1.min.js"
+
   app.log "App started"
 
   app.embed_stylesheet %(
     .red { color: red; }
+    .b-yellow { background-color: yellow; }
   )
 
   app.create_element("h1").tap do |h1|
@@ -39,6 +43,7 @@ server = Redomi::Server.new host, port do |app|
   first.text_content = "first"
 
   second = app.create_element("li")
+  jq_second = Redomi::Lib::JQuery.new(second)
   second.text_content = "second"
   second.class_name = "red"
 
@@ -48,6 +53,10 @@ server = Redomi::Server.new host, port do |app|
 
   button.on_click do |btn|
     second.text_content = "changed!"
+    sleep 0.5
+    jq_second.text = "#{jq_second.text} again!"
+    sleep 0.5
+    jq_second.html = "with <b>html()</b>"
   end
 
   sleep 0.5
@@ -55,6 +64,7 @@ server = Redomi::Server.new host, port do |app|
 
   sleep 0.5
   second.parent.class_name = "red"
+  jq_second.parent.add_class("b-yellow")
 
   # pp app.query_selector("h1").text
 end

@@ -2,7 +2,7 @@ require "http/server"
 
 module Redomi
   class Server
-    def initialize(@host, @port, &@init : App -> Void)
+    def initialize(@host, @port, @public, &@init : App -> Void)
     end
 
     def listen
@@ -15,6 +15,7 @@ module Redomi
       server = HTTP::Server.new @host, @port, [
         ws_handler,
         PageHandler.new("/", File.join(Redomi::PATH, "public", "index.html")),
+        HTTP::StaticFileHandler.new(@public),
         HTTP::StaticFileHandler.new(File.join(Redomi::PATH, "public")),
       ]
       server.listen

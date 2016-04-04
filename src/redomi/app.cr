@@ -42,6 +42,14 @@ module Redomi
       eval "console.log(%s)", message
     end
 
+    def load_script(path)
+      node = create_element("script")
+      node["type"] = "text/javascript"
+      node["src"] = path
+      query_selector("head").append_child(node)
+      node
+    end
+
     def embed_stylesheet(css_code)
       node = create_element("style")
       node["type"] = "text/css"
