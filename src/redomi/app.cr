@@ -58,7 +58,7 @@ module Redomi
       node
     end
 
-    def create_element(tag)
+    def create_element(tag, t : Node.class = Node.class)
       @last_node_id += 1
 
       send_command "create" do |json|
@@ -66,8 +66,9 @@ module Redomi
         json.field "id", @last_node_id
       end
 
-      node = Node.new(@last_node_id)
+      node = t.new(@last_node_id)
       node.app = self
+      node.init
       node
     end
 

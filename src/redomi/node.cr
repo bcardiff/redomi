@@ -13,6 +13,15 @@ module Redomi
       @app.register_node(self)
     end
 
+    def init
+    end
+
+    def self.append(parent : Node)
+      input = parent.app.create_element("input", self)
+      parent.append_child(input)
+      input
+    end
+
     def append_child(node : Node)
       @app.eval("%s.appendChild(%s)", self, node)
     end
@@ -31,6 +40,10 @@ module Redomi
 
     def []=(attribute : String, value : String)
       @app.eval("%s.setAttribute(%s, %s)", self, attribute, value)
+    end
+
+    def [](attribute : String)
+      @app.eval_sync("%s.getAttribute(%s)", self, attribute) as String
     end
 
     def class_name=(cssClass : String)
