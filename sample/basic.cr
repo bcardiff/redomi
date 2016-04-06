@@ -69,5 +69,4 @@ server = Redomi::Server.new(host, port, File.join(__DIR__, "public")) do |app|
   # pp app.query_selector("h1").text
 end
 
-puts "Listening on http://#{host}:#{port}"
 server.listen

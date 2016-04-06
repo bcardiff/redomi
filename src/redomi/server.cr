@@ -18,6 +18,8 @@ module Redomi
         HTTP::StaticFileHandler.new(@public),
         HTTP::StaticFileHandler.new(File.join(Redomi::PATH, "public")),
       ]
+
+      puts "Listening on http://#{@host}:#{@port}"
       server.listen
     end
 
