@@ -58,7 +58,7 @@ module Redomi
       node
     end
 
-    def create_element(tag, t : Node.class = Node.class)
+    def create_element(tag, t : Node.class = Node)
       @last_node_id += 1
 
       send_command "create" do |json|
