@@ -11,9 +11,13 @@ module Redomi::SVG
 
   class Circle < SVGElement
     tag_name "circle"
+
+    float_attribute cx, cy, r
   end
 
   class Rect < SVGElement
     tag_name "rect"
+
+    float_attribute x, y, width, height
   end
 end

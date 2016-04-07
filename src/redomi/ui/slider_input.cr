@@ -6,13 +6,7 @@ module Redomi::UI
       self["type"] = "range"
     end
 
-    def value=(value)
-      @app.eval("%s.value = %s", self, value.to_i64)
-    end
-
-    def value
-      (@app.eval_sync("%s.value", self) as String).to_i64
-    end
+    int_property value
 
     def on_value_change(&on_click : SliderInput, Int64 -> Void)
       on_key = ->(node : Node) {

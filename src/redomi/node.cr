@@ -26,10 +26,45 @@ module Redomi
       input
     end
 
+    def self.append_to(tag, parent : Node)
+      input = parent.app.create_element(tag, self)
+      yield input
+      parent.append_child(input)
+      input
+    end
+
     macro tag_name(tag)
       def self.append_to(parent : Node)
         self.append_to({{tag}}, parent)
       end
+
+      def self.append_to(parent : Node, &block : {{@type}} ->)
+        self.append_to({{tag}}, parent, &block)
+      end
+    end
+
+    macro float_attribute(*names)
+    {% for name in names %}
+      def {{name.id}}=(value)
+        self[{{name.stringify}}] = value.to_f64.to_s
+      end
+
+      def {{name.id}}
+        self[{{name.stringify}}].to_f64
+      end
+    {% end %}
+    end
+
+    macro int_property(*names)
+    {% for name in names %}
+      def {{name.id}}=(value)
+        @app.eval({{"%s.#{name.id} = %s"}}, self, value.to_i64)
+      end
+
+      def {{name.id}}
+        (@app.eval_sync({{"%s.#{name.id}"}}, self) as String).to_i64
+      end
+    {% end %}
     end
 
     def append_child(node : Node)
