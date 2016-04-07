@@ -2,7 +2,7 @@ require "../src/redomi"
 host = "localhost"
 port = 9090
 
-server = Redomi::Server.new(host, port, File.join(__DIR__, "public")) do |app|
+server = Redomi::Server.new(host, port) do |app|
   app.embed_stylesheet %(
     .blue-sq {
       background-color: blue;

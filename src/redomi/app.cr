@@ -63,6 +63,7 @@ module Redomi
 
       send_command "create" do |json|
         json.field "tag", tag
+        json.field "namespace", t.namespace if t.namespace
         json.field "id", @last_node_id
       end
 

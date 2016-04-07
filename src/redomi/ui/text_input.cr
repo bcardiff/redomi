@@ -1,5 +1,7 @@
 module Redomi::UI
   class TextInput < Node
+    tag_name "input"
+
     def init
       self["type"] = "text"
     end

@@ -16,10 +16,20 @@ module Redomi
     def init
     end
 
-    def self.append(parent : Node)
-      input = parent.app.create_element("input", self)
+    def self.namespace
+      nil
+    end
+
+    def self.append_to(tag, parent : Node)
+      input = parent.app.create_element(tag, self)
       parent.append_child(input)
       input
+    end
+
+    macro tag_name(tag)
+      def self.append_to(parent : Node)
+        self.append_to({{tag}}, parent)
+      end
     end
 
     def append_child(node : Node)

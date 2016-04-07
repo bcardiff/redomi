@@ -1,10 +1,27 @@
 var ws = new WebSocket("ws://" + location.host);
 var nodes = {};
-assign_node_id = function(dom, id) {
+set_node_id = function(dom, id) {
   nodes[id] = dom;
-  dom.dataset.remodiNodeId = id;
-}
-assign_node_id(document.body, 0);
+  if (dom.dataset !== undefined) {
+    dom.dataset.redomiNodeId = id;
+  } else {
+    dom.setAttribute("data-redomi-id", id);
+  }
+};
+
+get_node_id = function(dom) {
+  if (dom.dataset !== undefined) {
+    return parseInt(dom.dataset.redomiNodeId);
+  } else {
+    if (dom.hasAttribute("data-redomi-id")) {
+      return parseInt(dom.getAttribute("data-redomi-id"));
+    } else {
+      return undefined;
+    }
+  }
+};
+
+set_node_id(document.body, 0);
 var last_node_id = 0;
 
 ws.onopen = function() {
@@ -13,12 +30,12 @@ ws.onopen = function() {
 
 encode_result = function(result) {
   if (result instanceof Element) {
-    if (result.dataset.remodiNodeId === undefined) {
+    if (get_node_id(result) === undefined) {
       last_node_id--;
-      assign_node_id(result, last_node_id);
+      set_node_id(result, last_node_id);
     }
 
-    return {__remodi_node_id: parseInt(result.dataset.remodiNodeId)}
+    return {__remodi_node_id: get_node_id(result)}
   }
 
   if (result instanceof Array) {
@@ -36,8 +53,13 @@ ws.onmessage = function(e) {
   var message = JSON.parse(e.data);
   switch (message.command) {
   case "create":
-    var node = document.createElement(message.data.tag);
-    assign_node_id(node, message.data.id);
+    var node;
+    if (message.data.namespace === undefined) {
+      node = document.createElement(message.data.tag);
+    } else {
+      node = document.createElementNS(message.data.namespace, message.data.tag);
+    }
+    set_node_id(node, message.data.id);
     break;
   case "eval":
     eval(message.data.script);
