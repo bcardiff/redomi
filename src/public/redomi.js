@@ -11,7 +11,11 @@ set_node_id = function(dom, id) {
 
 get_node_id = function(dom) {
   if (dom.dataset !== undefined) {
-    return parseInt(dom.dataset.redomiNodeId);
+    if (dom.dataset.redomiNodeId !== undefined) {
+      return parseInt(dom.dataset.redomiNodeId);
+    } else {
+      return undefined;
+    }
   } else {
     if (dom.hasAttribute("data-redomi-id")) {
       return parseInt(dom.getAttribute("data-redomi-id"));
@@ -35,7 +39,7 @@ encode_result = function(result) {
       set_node_id(result, last_node_id);
     }
 
-    return {__remodi_node_id: get_node_id(result)}
+    return {__redomi_node_id: get_node_id(result)}
   }
 
   if (result instanceof Array) {

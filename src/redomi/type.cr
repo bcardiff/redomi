@@ -16,7 +16,7 @@ end
 
 class Hash(K, V)
   def to_redomi(app)
-    if (node_id = self["__remodi_node_id"]?) && node_id.is_a?(Int64)
+    if (node_id = self["__redomi_node_id"]?) && node_id.is_a?(Int64)
       app.node_by_id node_id.to_i32
     else
       h = Hash(K, Redomi::Type).new

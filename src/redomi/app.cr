@@ -97,7 +97,7 @@ module Redomi
 
     private def encode_param(arg)
       if arg.is_a?(Node)
-        {"__remodi_node_id": arg.id}
+        {"__redomi_node_id": arg.id}
       else
         arg
       end
@@ -107,9 +107,21 @@ module Redomi
       args.map { |arg| encode_param(arg) }.to_a
     end
 
+    def eval(command)
+      send_command "eval" do |json|
+        json.field "script", command
+      end
+    end
+
     def eval(command, *arg : Redomi::Type)
       send_command "eval" do |json|
         json.field "script", build_client_script(command, *arg)
+      end
+    end
+
+    def eval_sync(command)
+      send_command_sync "eval_sync" do |json|
+        json.field "script", command
       end
     end
 
