@@ -25,7 +25,7 @@ spawn do
       # request and perform on each client
       spawn do
         app.update_mouse
-        app.render_mouses
+        app.render_mice
       end
     end
     $last_usage = `ps -p #{Process.pid} -o %cpu,%mem`
@@ -58,7 +58,7 @@ class ColabCursorApp
     pp @mouse
   end
 
-  def render_mouses
+  def render_mice
     # ensure there are enough widgets for all apps
     ($apps.size - @widgets.size).times do
       @widgets << Redomi::Node.append_to("div", @app.root) do |node|
