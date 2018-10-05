@@ -75,6 +75,14 @@ module Redomi
       @app.eval_sync("%s.parentElement", self).as(Node)
     end
 
+    def first_child
+      @app.eval_sync("%s.firstChild", self).as(Node?)
+    end
+
+    def remove_child(child : Node)
+      @app.eval("%s.removeChild(%s)", self, child)
+    end
+
     def text_content=(text : String)
       @app.eval("%s.textContent = %s", self, text)
     end
