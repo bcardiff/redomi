@@ -62,7 +62,7 @@ module Redomi
       end
 
       def {{name.id}}
-        (@app.eval_sync({{"%s.#{name.id}"}}, self) as String).to_i64
+        (@app.eval_sync({{"%s.#{name.id}"}}, self).as(String)).to_i64
       end
     {% end %}
     end
@@ -72,7 +72,7 @@ module Redomi
     end
 
     def parent
-      @app.eval_sync("%s.parentElement", self) as Node
+      @app.eval_sync("%s.parentElement", self).as(Node)
     end
 
     def text_content=(text : String)
@@ -80,7 +80,7 @@ module Redomi
     end
 
     def text_content
-      @app.eval_sync("%s.textContent", self) as String
+      @app.eval_sync("%s.textContent", self).as(String)
     end
 
     def []=(attribute : String, value : String)
@@ -88,7 +88,7 @@ module Redomi
     end
 
     def [](attribute : String)
-      @app.eval_sync("%s.getAttribute(%s)", self, attribute) as String
+      @app.eval_sync("%s.getAttribute(%s)", self, attribute).as(String)
     end
 
     def class_name=(cssClass : String)

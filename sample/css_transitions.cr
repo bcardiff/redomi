@@ -1,8 +1,6 @@
 require "../src/redomi"
-host = "localhost"
-port = 9090
 
-server = Redomi::Server.new(host, port) do |app|
+server = Redomi::Server.setup do |app|
   app.embed_stylesheet %(
     .blue-sq {
       background-color: blue;
@@ -25,4 +23,5 @@ server = Redomi::Server.new(host, port) do |app|
   sq["style"] = "transition: width 2s, height 2s, background-color 2s, transform 2s;"
 end
 
+server.bind "tcp://127.0.0.1:9090"
 server.listen

@@ -11,12 +11,12 @@ module Redomi::UI
     end
 
     def value
-      @app.eval_sync("%s.value", self) as String
+      @app.eval_sync("%s.value", self).as(String)
     end
 
     def on_value_change(&on_click : TextInput, String -> Void)
       on_key = ->(node : Node) {
-        node = node as TextInput
+        node = node.as(TextInput)
         on_click.call(node, node.value)
       }
       @app.add_event_listener(self, "keypress", on_key)

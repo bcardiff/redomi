@@ -1,10 +1,7 @@
 require "../src/redomi"
 require "../src/redomi/lib/jquery"
 
-host = "localhost"
-port = 9090
-
-server = Redomi::Server.new(host, port) do |app|
+server = Redomi::Server.setup do |app|
   slider = Redomi::UI::SliderInput.append_to(app.root)
   slider.value = 20
 
@@ -28,4 +25,5 @@ server = Redomi::Server.new(host, port) do |app|
   end
 end
 
+server.bind "tcp://127.0.0.1:9090"
 server.listen

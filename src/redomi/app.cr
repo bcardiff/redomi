@@ -74,7 +74,7 @@ module Redomi
     end
 
     def query_selector(query)
-      eval_sync("document.querySelector(%s)", query) as Node
+      eval_sync("document.querySelector(%s)", query).as(Node)
     end
 
     # :nodoc:
@@ -154,14 +154,19 @@ module Redomi
 
     private def send_command(command)
       @ws.send(String.build do |io|
-        io.json_object do |json|
+        json = JSON::Builder.new(io)
+        json.start_document
+
+        json.object do
           json.field "command", command
           json.field "data" do
-            io.json_object do |json|
-              yield json, io
+            json.object do
+              yield json
             end
           end
         end
+
+        json.end_document
       end)
     end
 
@@ -172,9 +177,9 @@ module Redomi
       ch = Channel(JSON::Any).new # :: Channel::Unbuffered
       @pending_responses[response_id] = ch
 
-      send_command command do |json, io|
+      send_command command do |json|
         json.field "response_id", response_id
-        yield json, io
+        yield json
       end
 
       response = ch.receive.raw.to_redomi(self)

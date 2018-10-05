@@ -1,5 +1,7 @@
 module Redomi::Lib
   class D3
+    @app : App
+
     def initialize(@node : Node)
       @app = @node.app
     end
@@ -9,8 +11,14 @@ module Redomi::Lib
     end
 
     class Transition
+      @app : App
+
       def initialize(@node : Node)
         @app = @node.app
+      end
+
+      def style(properties : NamedTuple)
+        style(properties.to_h)
       end
 
       def style(properties : Hash)

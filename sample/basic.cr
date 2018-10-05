@@ -1,10 +1,7 @@
 require "../src/redomi"
 require "../src/redomi/lib/jquery"
 
-host = "localhost"
-port = 9090
-
-server = Redomi::Server.new(host, port, File.join(__DIR__, "public")) do |app|
+server = Redomi::Server.setup(File.join(__DIR__, "public")) do |app|
   app.load_script "/jquery-2.2.1.min.js"
 
   app.log "App started"
@@ -69,4 +66,5 @@ server = Redomi::Server.new(host, port, File.join(__DIR__, "public")) do |app|
   # pp app.query_selector("h1").text
 end
 
+server.bind "tcp://127.0.0.1:9090"
 server.listen

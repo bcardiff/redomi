@@ -1,9 +1,7 @@
 require "../src/redomi"
 require "../src/redomi/lib/d3"
-host = "localhost"
-port = 9090
 
-server = Redomi::Server.new(host, port, File.join(__DIR__, "public")) do |app|
+server = Redomi::Server.setup(File.join(__DIR__, "public")) do |app|
   app.load_script "/d3.min.js"
   sleep 0.1
 
@@ -27,4 +25,5 @@ server = Redomi::Server.new(host, port, File.join(__DIR__, "public")) do |app|
   Redomi::Lib::D3.new(sq).transition.style({"background-color": "blue"})
 end
 
+server.bind "tcp://127.0.0.1:9090"
 server.listen

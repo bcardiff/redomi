@@ -1,5 +1,7 @@
 module Redomi::Lib
   class JQuery
+    @app : App
+
     def initialize(@node : Node)
       @app = @node.app
     end
@@ -9,7 +11,7 @@ module Redomi::Lib
     end
 
     def text
-      @app.eval_sync("$(%s).text()", @node) as String
+      @app.eval_sync("$(%s).text()", @node).as(String)
     end
 
     def html=(html)
@@ -17,11 +19,11 @@ module Redomi::Lib
     end
 
     def html
-      @app.eval_sync("$(%s).html()", @node) as String
+      @app.eval_sync("$(%s).html()", @node).as(String)
     end
 
     def parent
-      self.class.new(@app.eval_sync("$(%s).parent()[0]", @node) as Node)
+      self.class.new(@app.eval_sync("$(%s).parent()[0]", @node).as(Node))
     end
 
     def add_class(css_class)

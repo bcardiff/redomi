@@ -1,9 +1,7 @@
 require "../src/redomi"
 include Redomi
-host = "localhost"
-port = 9090
 
-server = Server.new(host, port) do |app|
+server = Server.setup do |app|
   app.log "App started"
 
   Node.append_to("h1", app.root) do |node|
@@ -21,4 +19,5 @@ server = Server.new(host, port) do |app|
   end
 end
 
+server.bind "tcp://127.0.0.1:9090"
 server.listen
