@@ -9,7 +9,7 @@ module Redomi
       @node_events = {} of {Int32, String} => (Node -> Void)
       @last_node_id = 0
       @last_response_id = 0
-      @pending_responses = {} of Int32 => Channel::Unbuffered(JSON::Any)
+      @pending_responses = {} of Int32 => Channel(JSON::Any)
 
       @ws.on_message do |message|
         json = JSON.parse(message)
@@ -174,7 +174,7 @@ module Redomi
       @last_response_id += 1
       response_id = @last_response_id
 
-      ch = Channel(JSON::Any).new # :: Channel::Unbuffered
+      ch = Channel(JSON::Any).new
       @pending_responses[response_id] = ch
 
       send_command command do |json|
